@@ -1,6 +1,7 @@
 package openpgp
 
 import (
+	"crypto"
 	"fmt"
 	"os"
 
@@ -11,14 +12,16 @@ import (
 // GenerateKeyPair gera o par de chaves pub/priv
 func GenerateKeyPair(name, email string) error {
 	// Abrir o arquivo para gravar a chave privada
-	privateKeyFile, err := os.Create("private_key.gpg")
+	privateKeyFileName := name + "_private_key.gpg"
+	privateKeyFile, err := os.Create(privateKeyFileName)
 	if err != nil {
 		return err
 	}
 	defer privateKeyFile.Close()
 
 	// Abrir o arquivo para gravar a chave pública
-	publicKeyFile, err := os.Create("public_key.gpg")
+	publicKeyFileName := name + "_public_key.gpgp"
+	publicKeyFile, err := os.Create(publicKeyFileName)
 	if err != nil {
 		return err
 	}
@@ -28,8 +31,8 @@ func GenerateKeyPair(name, email string) error {
 	config := &packet.Config{
 		DefaultCipher:          packet.CipherAES256,
 		DefaultCompressionAlgo: packet.CompressionZLIB,
-		// DefaultHash:            packet.SHA256,
-		RSABits: 2048,
+		DefaultHash:            crypto.SHA256,
+		RSABits:                2048,
 		// Time:    nil, // Hora atual
 	}
 
