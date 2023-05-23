@@ -28,6 +28,8 @@ keys/
 *.asc
 *.bak
 *.txt
+*.gpg
+*.pgp
 
 # JetBrains IDE
 .idea/
