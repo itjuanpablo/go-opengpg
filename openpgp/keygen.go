@@ -24,18 +24,13 @@ func GenerateKeyPair(name, email string) error {
 	}
 	defer publicKeyFile.Close()
 
-	// Configurações para geração da chave
+	// Configurações da entidade
 	config := &packet.Config{
 		DefaultCipher:          packet.CipherAES256,
-		DefaultCompressionAlgo: packet.CompressionNone,
+		DefaultCompressionAlgo: packet.CompressionZLIB,
 		// DefaultHash:            packet.SHA256,
 		RSABits: 2048,
-		Time:    nil, // Hora atual
-		// Algorithm: []uint8{
-		// 	packet.PubKeyAlgoDSA,
-		// 	packet.PubKeyAlgoEdDSA,
-		// 	packet.PubKeyAlgoECDSA,
-		// },
+		// Time:    nil, // Hora atual
 	}
 
 	// Gerar par de chaves

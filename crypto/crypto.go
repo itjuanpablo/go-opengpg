@@ -1,4 +1,4 @@
-package enc
+package crypto
 
 import (
 	"bytes"
@@ -12,8 +12,8 @@ import (
 
 // Variávies de ambiente
 const (
-	mySecretString     = "This is so very secret!"
-	prefix, passphrase = "/files", "teste"
+	mySecretString     = "/files/encrypt.txt"
+	prefix, passphrase = "", "teste123"
 	secretKeyring      = prefix + "/keys/riversoft_privkey.gpg"
 	publicKeyring      = prefix + "/keys/riversoft_pubkey.gpg"
 )
