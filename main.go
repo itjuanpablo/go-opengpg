@@ -1,24 +1,36 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
 	"stcpsyncpgp/openpgp"
 )
 
 // Definição os dados a serem preenchidos
-var name, comment, email string
+var name, comment, email, directory string
 
 func main() {
+	reader := bufio.NewReader(os.Stdin)
+
 	for {
 		fmt.Print("Name: ")
-		fmt.Scan(&name)
+		name, _ = reader.ReadString('\n')
+		name = strings.TrimSpace(name)
 
 		fmt.Print("Comment: ")
-		fmt.Scan(&comment)
+		email, _ = reader.ReadString('\n')
+		email = strings.TrimSpace(comment)
+
+		fmt.Print("DirectoryPath: ")
+		directory, _ = reader.ReadString('\n')
+		directory = strings.TrimSpace(directory)
 
 		fmt.Print("Email: ")
-		fmt.Scan(&email)
+		email, _ = reader.ReadString('\n')
+		email = strings.TrimSpace(email)
 		if openpgp.ValidateEmail(email) {
 			break
 		} else {
@@ -26,5 +38,5 @@ func main() {
 		}
 	}
 
-	openpgp.GenerateKeyPair(name, email)
+	openpgp.GenerateKeyPair(name, email, directory)
 }

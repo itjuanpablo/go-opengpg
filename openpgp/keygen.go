@@ -4,24 +4,40 @@ import (
 	"crypto"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/ProtonMail/go-crypto/openpgp/packet"
 )
 
 // GenerateKeyPair gera o par de chaves pub/priv
-func GenerateKeyPair(name, email string) error {
+func GenerateKeyPair(name, email, directory string) error {
+	// Verificar se o diretório fornecido existe
+	if _, err := os.Stat(directory); os.IsNotExist(err) {
+		// Criar o diretório se não existir
+		err := os.MkdirAll(directory, 0o755)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Nome base dos arquivos de chaves
+	baseFileName := name + "_key"
+
+	// Caminhos completos para os arquivos
+	privateKeyFilePath := filepath.Join(directory, baseFileName+"_private.gpg")
+	publicKeyFilePath := filepath.Join(directory, baseFileName+"_public.gpg")
+
 	// Abrir o arquivo para gravar a chave privada
-	privateKeyFileName := name + "_private_key.gpg"
-	privateKeyFile, err := os.Create(privateKeyFileName)
+	privateKeyFile, err := os.Create(privateKeyFilePath)
 	if err != nil {
 		return err
 	}
 	defer privateKeyFile.Close()
 
 	// Abrir o arquivo para gravar a chave pública
-	publicKeyFileName := name + "_public_key.gpg"
-	publicKeyFile, err := os.Create(publicKeyFileName)
+
+	publicKeyFile, err := os.Create(publicKeyFilePath)
 	if err != nil {
 		return err
 	}
