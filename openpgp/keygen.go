@@ -20,7 +20,7 @@ func GenerateKeyPair(name, email string) error {
 	defer privateKeyFile.Close()
 
 	// Abrir o arquivo para gravar a chave pública
-	publicKeyFileName := name + "_public_key.gpgp"
+	publicKeyFileName := name + "_public_key.gpg"
 	publicKeyFile, err := os.Create(publicKeyFileName)
 	if err != nil {
 		return err
