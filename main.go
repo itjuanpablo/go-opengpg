@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -9,34 +10,55 @@ import (
 	"stcpsyncpgp/openpgp"
 )
 
-// Definição os dados a serem preenchidos
-var name, comment, email, directory string
+// Variáveis principais
+var (
+	name       string
+	comment    string
+	email      string
+	directory  string
+	passphrase string
+)
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	for {
-		fmt.Print("Name: ")
+	genKeyFlag := flag.Bool("genkey", false, "Generate public/private OpenPGP key pair")
+
+	// Parsear as flags da linha de comando
+	flag.Parse()
+
+	if *genKeyFlag {
+		fmt.Println("Generate public/private opengpg key pair.")
+		fmt.Print("Enter directory in which to save the key (Example: C:/keys/): ")
+		directory, _ = reader.ReadString('\n')
+		directory = strings.TrimSpace(directory)
+
+		fmt.Print("Enter passphrase (empty for no passphrase): ")
+		passphrase, _ = reader.ReadString('\n')
+		passphrase = strings.TrimSpace(passphrase)
+
+		fmt.Print("Enter the key name: ")
 		name, _ = reader.ReadString('\n')
 		name = strings.TrimSpace(name)
 
 		fmt.Print("Comment: ")
-		email, _ = reader.ReadString('\n')
-		email = strings.TrimSpace(comment)
+		comment, _ = reader.ReadString('\n')
+		comment = strings.TrimSpace(comment)
 
-		fmt.Print("DirectoryPath: ")
-		directory, _ = reader.ReadString('\n')
-		directory = strings.TrimSpace(directory)
+		for {
+			fmt.Print("Email: ")
+			email, _ = reader.ReadString('\n')
+			email = strings.TrimSpace(email)
+			if openpgp.ValidateEmail(email) {
+				break
+			} else {
+				fmt.Println("Invalid email. (example@email.com)")
+			}
 
-		fmt.Print("Email: ")
-		email, _ = reader.ReadString('\n')
-		email = strings.TrimSpace(email)
-		if openpgp.ValidateEmail(email) {
-			break
-		} else {
-			fmt.Println("Email inválido. Por favor, insira um email válido")
 		}
-	}
 
-	openpgp.GenerateKeyPair(name, email, directory)
+		openpgp.GenerateKeyPair(name, email, directory)
+
+		return
+	}
 }

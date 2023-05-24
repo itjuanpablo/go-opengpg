@@ -49,7 +49,7 @@ func GenerateKeyPair(name, email, directory string) error {
 		DefaultCompressionAlgo: packet.CompressionZLIB,
 		DefaultHash:            crypto.SHA256,
 		RSABits:                2048,
-		// Time:    nil, // Hora atual
+		// Time:                   &expiration, // Data de expiração da chave
 	}
 
 	// Gerar par de chaves
