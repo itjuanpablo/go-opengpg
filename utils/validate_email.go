@@ -1,4 +1,4 @@
-package openpgp
+package utils
 
 import "regexp"
 

@@ -1,17 +1,18 @@
-package openpgp
+package utils
 
 import (
 	"crypto"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/ProtonMail/go-crypto/openpgp/packet"
 )
 
 // GenerateKeyPair gera o par de chaves pub/priv
-func GenerateKeyPair(name, email, directory string) error {
+func GenerateKeyPair(name, email, directory string, expiration time.Time) error {
 	// Verificar se o diretório fornecido existe
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		// Criar o diretório se não existir
@@ -43,13 +44,15 @@ func GenerateKeyPair(name, email, directory string) error {
 	}
 	defer publicKeyFile.Close()
 
+	expirationInSeconds := expiration.Unix() - time.Now().Unix()
+
 	// Configurações da entidade
 	config := &packet.Config{
 		DefaultCipher:          packet.CipherAES256,
 		DefaultCompressionAlgo: packet.CompressionZLIB,
 		DefaultHash:            crypto.SHA256,
 		RSABits:                2048,
-		// Time:                   &expiration, // Data de expiração da chave
+		KeyLifetimeSecs:        uint32(expirationInSeconds), // Data de expiração da chave
 	}
 
 	// Gerar par de chaves

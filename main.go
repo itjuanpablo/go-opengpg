@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
-	"stcpsyncpgp/openpgp"
+	"stcpsyncpgp/utils"
 )
 
 // Variáveis principais
@@ -23,6 +24,7 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	genKeyFlag := flag.Bool("genkey", false, "Generate public/private OpenPGP key pair")
+	expiration := flag.Int("expiration", 365, "Define expiration time key")
 
 	// Parsear as flags da linha de comando
 	flag.Parse()
@@ -41,15 +43,15 @@ func main() {
 		name, _ = reader.ReadString('\n')
 		name = strings.TrimSpace(name)
 
-		fmt.Print("Comment: ")
+		fmt.Print("Enter your comment: ")
 		comment, _ = reader.ReadString('\n')
 		comment = strings.TrimSpace(comment)
 
 		for {
-			fmt.Print("Email: ")
+			fmt.Print("Enter your email: ")
 			email, _ = reader.ReadString('\n')
 			email = strings.TrimSpace(email)
-			if openpgp.ValidateEmail(email) {
+			if utils.ValidateEmail(email) {
 				break
 			} else {
 				fmt.Println("Invalid email. (example@email.com)")
@@ -57,7 +59,8 @@ func main() {
 
 		}
 
-		openpgp.GenerateKeyPair(name, email, directory)
+		expirationTime := time.Now().AddDate(0, 0, *expiration)
+		utils.GenerateKeyPair(name, email, directory, expirationTime)
 
 		return
 	}
