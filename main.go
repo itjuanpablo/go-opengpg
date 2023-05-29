@@ -172,14 +172,13 @@ func main() {
 		for {
 			if *expTime {
 				fmt.Println(`
-				Specify how long the key should be valid
-				0 = key not expires
-				d = key expires n days
-				w = key expires n weeks
-				m = key expires n months
-				y = key expires n years
-				`)
-				fmt.Printf("Is the key valid for? (0)")
+			Specify how long the key should be valid
+			<n>0 = key not expires
+			<n>d = key expires n days
+			<n>w = key expires n weeks
+			<n>m = key expires n months
+			<n>y = key expires n years`)
+				fmt.Printf("Is the key valid for? (0) ")
 				fmt.Scanln(&expirationInput)
 				if expirationInput != "" {
 					dataExp, err := utils.ParseKeyDuration(expirationInput)
