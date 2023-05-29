@@ -1,67 +1,96 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"os"
-	"strings"
+	"log"
 	"time"
 
-	"stcpsyncpgp/utils"
+	"openpgp/utils"
 )
 
-// Variáveis principais
 var (
-	name       string
-	comment    string
-	email      string
-	directory  string
-	passphrase string
+	directory       string
+	name            string
+	comment         string
+	email           string
+	bits            string
+	passphrase      string
+	expirationInput string
+	expirationTime  time.Time
 )
+
+var privKey, pubKey, keyOutputDir, fileToEncrypt, fileToDecrypt string
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	genKeyFlag := flag.Bool("genkey", false, "Generate public/private OpenPGP key pair")
-	expiration := flag.Int("expiration", 365, "Define expiration time key")
-
-	// Parsear as flags da linha de comando
+	// Flags de uso
+	flag.StringVar(&privKey, "privKey", "", "[Directory where the private key is located]")
+	flag.StringVar(&pubKey, "pubKey", "", "[Directory where the public key is located]")
 	flag.Parse()
 
-	if *genKeyFlag {
-		fmt.Println("Generate public/private opengpg key pair.")
-		fmt.Print("Enter directory in which to save the key (Example: C:/keys/): ")
-		directory, _ = reader.ReadString('\n')
-		directory = strings.TrimSpace(directory)
-
-		fmt.Print("Enter passphrase (empty for no passphrase): ")
-		passphrase, _ = reader.ReadString('\n')
-		passphrase = strings.TrimSpace(passphrase)
-
-		fmt.Print("Enter the key name: ")
-		name, _ = reader.ReadString('\n')
-		name = strings.TrimSpace(name)
-
-		fmt.Print("Enter your comment: ")
-		comment, _ = reader.ReadString('\n')
-		comment = strings.TrimSpace(comment)
-
-		for {
-			fmt.Print("Enter your email: ")
-			email, _ = reader.ReadString('\n')
-			email = strings.TrimSpace(email)
-			if utils.ValidateEmail(email) {
-				break
-			} else {
-				fmt.Println("Invalid email. (example@email.com)")
-			}
-
-		}
-
-		expirationTime := time.Now().AddDate(0, 0, *expiration)
-		utils.GenerateKeyPair(name, email, directory, expirationTime)
-
+	// Mensagem de erro caso nenhuma flag setada seja para encriptar, decriptar ou gerar o par de chaves
+	if flag.NArg() == 0 || (flag.Arg(0)) != "encrypt" && (flag.Arg(0) != "decrypt" && flag.Arg(0) != "keygen") {
+		errorMessage := "Error: Subcommand " + flag.Arg(0) + "is not available"
+		fmt.Println(errorMessage)
+		usage()
 		return
 	}
+
+	switch {
+	case flag.Arg(0) == "encrypt":
+		if pubKey == "" {
+			fmt.Println("Error: -pubKey is required")
+			usage()
+			return
+		}
+	}
+
+	fs := flag.NewFlagSet("encrypt [flags]", flag.ExitOnError)
+
+	fs.StringVar(&fileToEncrypt, "file", "", "[File to encrypt]")
+	sygn := fs.Bool("sygn", false, "[Enter password to sign encrypted file]")
+
+	fs.Parse(flag.Args()[1:])
+
+	if *sygn {
+		if privKey == "" {
+			fmt.Println("Error: -privKey is required")
+			usage()
+			return
+		}
+
+		for passphrase == "" {
+			fmt.Print("Passphrase for sygn: ")
+			fmt.Scanln(&passphrase)
+		}
+
+		// Encriptar chave
+		err := utils.EncryptSygnMessageArmored(pubKey, privKey, passphrase, fileToEncrypt)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	} else {
+		err := utils.EncryptFileArmored(pubKey, fileToEncrypt)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+}
+
+func usage() {
+	fmt.Println()
+	fmt.Println("Available flags before subcommands encrypt or decrypt:")
+	fmt.Println("  -privKey string: specify secretKey")
+	fmt.Println("  -pubKey string: specify publicKey")
+	fmt.Println()
+	fmt.Println("Available flags after subcommand encrypt:")
+	fmt.Println("  -file string: specify file to encrypting process")
+	fmt.Println()
+	fmt.Println("Available flags after subcommand encrypt:")
+	fmt.Println("  -file string: specify file to decrypting process")
+	fmt.Println()
+	fmt.Println("Available flags after subcommand keygen:")
+	fmt.Println("  -passphrase string: Define if passphrase is on")
+	fmt.Println("  -expiration string: Define if keys expiration time is on")
+	fmt.Println()
 }
