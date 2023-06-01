@@ -50,7 +50,7 @@ func main() {
 		fs := flag.NewFlagSet("encrypt [flags]", flag.ExitOnError)
 
 		fs.StringVar(&fileToEncrypt, "file", "", "[File to encrypt]")
-		sygn := fs.Bool("sygn", false, "[Enter password to sign encrypted file]")
+		sygn := fs.Bool("sygn", false, "[Enter password to sygn encrypted file]")
 
 		fs.Parse(flag.Args()[1:])
 
@@ -127,7 +127,7 @@ func main() {
 
 		fs.Parse(flag.Args()[1:])
 
-		// Caminho do arquivo de salvamento das chaves
+		// Solicitar caminho do arquivo para salvar chave
 		fmt.Printf("Directory and prefix keys ('./key-defaultname') ")
 		fmt.Scanln(&directory)
 		if directory == "" {
@@ -145,19 +145,60 @@ func main() {
 		for {
 			fmt.Printf("Email adress: ")
 			fmt.Scanln(&email)
-			if ok := utils.ValidateEmail(email); !ok {
-				fmt.Println("Valid email, type again: ")
+			if ok := utils.ValidMailAddress(email); !ok {
+				fmt.Println("Invalid email, type again: ")
 				continue
 			} else {
 				break
 			}
 		}
 
-		fmt.Printf("Your User ID is: \n \n %s (%s) <%s>\"\n", strings.TrimSpace(name), strings.TrimSpace(comment), strings.TrimSpace(email))
+		fmt.Printf("Your User ID is:\n \"%s (%s) <%s>\"\n", strings.TrimSpace(name), strings.TrimSpace(comment), strings.TrimSpace(email))
+
+	loop:
+		for {
+			fmt.Print("Change (N)ame, (C)omment, (E)mail ou (O)k/(G)o out? ")
+			option, _ := reader.ReadString('\n')
+			option = strings.TrimSpace(strings.ToLower(option))
+
+			switch option {
+			case "n":
+				fmt.Print("Name: ")
+				name, _ = reader.ReadString('\n')
+
+			case "c":
+				fmt.Print("Comment: ")
+				comment, _ = reader.ReadString('\n')
+
+			case "e":
+				for {
+					fmt.Print("Email:")
+					fmt.Scanln(&email)
+					if ok := utils.ValidMailAddress(email); !ok {
+						fmt.Println("Invalid email, type again")
+						continue
+					} else {
+						break
+					}
+				}
+
+			case "o":
+				break loop
+			case "g":
+				log.Fatal("gpg: Generate key canceled.")
+			default:
+				fmt.Println("Invalid option. Try again.")
+			}
+			fmt.Printf("Your User ID is:\n \"%s (%s) <%s>\"\n", strings.TrimSpace(name), strings.TrimSpace(comment), strings.TrimSpace(email))
+		}
+
+		name = strings.TrimSpace(name)
+		comment = strings.TrimSpace(comment)
+		email = strings.TrimSpace(email)
 
 		for bitsKey != 1024 && bitsKey != 2048 && bitsKey != 4096 {
-			fmt.Println("Number bites of the keys: \n[1024 bits] [2048 bits] [4096 bits]")
-			fmt.Printf("Type the size (2048): ")
+			fmt.Println("Number bites of the keys:\n[1024 bits] [2048 bits] [4096 bits]")
+			fmt.Print("Type the size (default: 2048): ")
 			fmt.Scanln(&bitsKey)
 			if bitsKey == 0 {
 				bitsKey = 2048
@@ -178,7 +219,7 @@ func main() {
 			<n>w = key expires n weeks
 			<n>m = key expires n months
 			<n>y = key expires n years`)
-				fmt.Printf("Is the key valid for? (0) ")
+				fmt.Print("Is the key valid for? (0) ")
 				fmt.Scanln(&expirationInput)
 				if expirationInput != "" {
 					dataExp, err := utils.ParseKeyDuration(expirationInput)

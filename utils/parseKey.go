@@ -11,7 +11,6 @@ func ParseKeyDuration(durationKey string) (time.Time, error) {
 	if durationKey == "" {
 		return time.Now(), nil
 	}
-
 	unidade := string(durationKey[len(durationKey)-1])
 	durationStr := durationKey[:len(durationKey)-1]
 

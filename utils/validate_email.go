@@ -1,11 +1,15 @@
 package utils
 
-import "regexp"
+import "net/mail"
 
 // ValidateEmail faz a validação do formato do e-mail digitado
-func ValidateEmail(email string) bool {
-	// Expressão regular para validar o formato do e-mail
-	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	match, _ := regexp.MatchString(emailRegex, email)
-	return match
+func ValidMailAddress(address string) bool {
+	if address == "" {
+		return true
+	}
+	_, err := mail.ParseAddress(address)
+	if err != nil {
+		return false
+	}
+	return true
 }
