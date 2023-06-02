@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -127,11 +128,20 @@ func main() {
 
 		fs.Parse(flag.Args()[1:])
 
-		// Solicitar caminho do arquivo para salvar chave
-		fmt.Printf("Directory and prefix keys ('./key-defaultname') ")
-		fmt.Scanln(&directory)
-		if directory == "" {
-			directory = ".key-defaultname"
+		for {
+			// Solicitar caminho do arquivo para salvar chave
+			fmt.Printf("Directory and prefix keys ('./key-defaultname') ")
+			fmt.Scanln(&directory)
+			if directory == "" {
+				directory = ".key-defaultname"
+			}
+
+			_, err := os.Stat(filepath.Dir(directory))
+			if err != nil {
+				fmt.Println("Invalid directory. Type directory again")
+				continue
+			}
+			break
 		}
 
 		reader := bufio.NewReader(os.Stdin)
