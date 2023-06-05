@@ -268,7 +268,7 @@ func usage() {
 	fmt.Println("Available flags after subcommand encrypt:")
 	fmt.Println("  -file string: specify file to encrypting process")
 	fmt.Println()
-	fmt.Println("Available flags after subcommand encrypt:")
+	fmt.Println("Available flags after subcommand decrypt:")
 	fmt.Println("  -file string: specify file to decrypting process")
 	fmt.Println()
 	fmt.Println("Available flags after subcommand keygen:")
