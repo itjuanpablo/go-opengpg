@@ -72,7 +72,6 @@ func DecrytptVerifyMessageArmored(pubkey, privKey, passphrase, directory string)
 	pubKeyStringContent := string(pubKeyBitesContent)
 
 	// Ler conteúdo da chave
-
 	privKeyFile, err := os.Open(privKey)
 	if err != nil {
 		fmt.Printf("Error reading file:%s", err)
