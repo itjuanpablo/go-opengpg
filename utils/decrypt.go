@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -12,7 +11,7 @@ import (
 
 func DecryptMessageArmored(key, directory, passphrase string) error {
 	// Ler conteúdo do arquivo
-	keyBitesContent, err := ioutil.ReadFile(key)
+	keyBitesContent, err := os.ReadFile(filepath.Join(key))
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return err
@@ -20,7 +19,7 @@ func DecryptMessageArmored(key, directory, passphrase string) error {
 	keyStringContent := string(keyBitesContent)
 
 	// Ler conteúdo do arquivo
-	fileBitesContent, err := ioutil.ReadFile(directory)
+	fileBitesContent, err := os.ReadFile(filepath.Join(directory))
 	if err != nil {
 		if err != nil {
 			fmt.Println("Error reading file:", err)
