@@ -52,7 +52,7 @@ func EncryptFileArmored(key, directory string) error {
 	return nil
 }
 
-func EncryptSygnMessageArmored(pubKey, privKey, passphrase, directory string) error {
+func EncryptSignMessageArmored(pubKey, privKey, passphrase, directory string) error {
 	// Ler conteúdo do arquivo
 	pubkeyBitesContent, err := ioutil.ReadFile(pubKey)
 	if err != nil {

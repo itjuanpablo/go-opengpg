@@ -51,11 +51,11 @@ func main() {
 		fs := flag.NewFlagSet("encrypt [flags]", flag.ExitOnError)
 
 		fs.StringVar(&fileToEncrypt, "file", "", "[File to encrypt]")
-		sygn := fs.Bool("sygn", false, "[Enter password to sygn encrypted file]")
+		sign := fs.Bool("sign", false, "[Enter password to sign encrypted file]")
 
 		fs.Parse(flag.Args()[1:])
 
-		if *sygn {
+		if *sign {
 			if privKey == "" {
 				fmt.Println("Error: -privKey is required")
 				usage()
@@ -63,12 +63,12 @@ func main() {
 			}
 
 			for passphrase == "" {
-				fmt.Print("Passphrase for sygn: ")
+				fmt.Print("Passphrase for sign: ")
 				fmt.Scanln(&passphrase)
 			}
 
 			// Encriptar arquivo
-			err := utils.EncryptSygnMessageArmored(pubKey, privKey, passphrase, fileToEncrypt)
+			err := utils.EncryptSignMessageArmored(pubKey, privKey, passphrase, fileToEncrypt)
 			if err != nil {
 				log.Fatal(err.Error())
 			}
