@@ -17,32 +17,33 @@ func CheckKeys(keyFile string) error {
 	// Abrir arquivo
 	file, err := os.Open(keyFile)
 	if err != nil {
-		return fmt.Errorf("Falha ao abrir arquivo de chave", err)
+		fmt.Println("Falha ao abrir arquivo de chave")
 	}
 	defer file.Close()
 
 	// Ler arquivo de chave
 	entityList, err := openpgp.ReadArmoredKeyRing(file)
 	if err != nil {
-		return fmt.Errorf("Falha ao ler arquivo de chave", err)
+		fmt.Println("Falha ao abrir arquivo de chave")
+		}
 	}
 
 	// Verificar se é uma chave válida
 	entity := entityList[0]
 	privKey := entity.PrivateKey
 	if privKey == nil {
-		return fmt.Errorf("Não foi fornecida uma chave privada")
+		fmt.Println("Não foi fornecida uma chave privada")
 	}
 
 	var expires time.Time
-	// for _, ident := range entity.Identities {
-	// 	if ident.SelfSignature != nil && ident.SelfSignature.KeyLifetimeSecs > 0 {
-	// 		creationTime := ident.SelfSignature.CreationTime
-	// 		lifetimeSecs := time.Duration(ident.SelfSignature.KeyLifetimeSecs) * time.Second
-	// 		expires = creationTime.Add(lifetimeSecs)
-	// 		break
-	// 	}
-	// }
+	for _, ident := range entity.Identities {
+		if ident.SelfSignature != nil && ident.SelfSignature.KeyLifetimeSecs > 0 {
+			creationTime := ident.SelfSignature.CreationTime
+			lifetimeSecs := time.Duration(ident.SelfSignature.KeyLifetimeSecs) * time.Second
+			expires = creationTime.Add(lifetimeSecs)
+			break
+		}
+	}
 
 	// Verifica se a chave não tem data de expiração
 	if expires.IsZero() {

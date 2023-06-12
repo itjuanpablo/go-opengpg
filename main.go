@@ -21,6 +21,7 @@ var (
 	bitsKey         int
 	passphrase      string
 	expirationInput string
+	verifyKeys      string
 	expirationTime  time.Time
 )
 
@@ -30,10 +31,11 @@ func main() {
 	// Flags de uso
 	flag.StringVar(&privKey, "privKey", "", "[Directory where the private key is located]")
 	flag.StringVar(&pubKey, "pubKey", "", "[Directory where the public key is located]")
+	flag.StringVar(&verifyKeys, "verifyKeys", "", "[Check keypair, if it is an OpenpPGP keypair and expiry date]")
 	flag.Parse()
 
 	// Mensagem de erro caso nenhuma flag setada seja para encriptar, decriptar ou gerar o par de chaves
-	if flag.NArg() == 0 || (flag.Arg(0)) != "encrypt" && (flag.Arg(0) != "decrypt" && flag.Arg(0) != "keygen") {
+	if flag.NArg() == 0 || (flag.Arg(0)) != "encrypt" && (flag.Arg(0) != "decrypt" && flag.Arg(0) != "keygen" && flag.Arg(0) != "verifyKeys") {
 		errorMessage := "Error: Subcommand " + flag.Arg(0) + "is not available"
 		fmt.Println(errorMessage)
 		usage()
@@ -253,6 +255,16 @@ func main() {
 			log.Fatal(err)
 		}
 
+	case flag.Arg(0) == "verifyKeys":
+		// Especificar o diretório para ser lido o par de chaves
+		fmt.Println("Specify the directory where the key pair is located: (Ex: C:/keys)")
+		fmt.Scanln(&directory)
+		// Ler arquivo de chave
+
+		// Verificar se o conteúdo é um par de chaves OpenPGP
+
+		// Verificar se a chave ainda está válida
+
 	default:
 		usage()
 		return
@@ -264,6 +276,7 @@ func usage() {
 	fmt.Println("Available flags before subcommands encrypt or decrypt:")
 	fmt.Println("  -privKey string: specify secretKey")
 	fmt.Println("  -pubKey string: specify publicKey")
+	fmt.Println("  -verifyKeys string: specify Keys pair for verify details")
 	fmt.Println()
 	fmt.Println("Available flags after subcommand encrypt:")
 	fmt.Println("  -file string: specify file to encrypting process")
